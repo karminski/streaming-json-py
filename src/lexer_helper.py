@@ -1,10 +1,19 @@
+"""
+helper method for lexer
+"""
+
 def is_ignore_token(c):
+    """
+    check if target character is ignore token
+    """
     return c in '\t\n\v\f\r '
 
 def match_stack(stack, tokens):
+    """
+    check if target stack match given tokens
+    """
     pointer = len(stack)
     tokens_left = len(tokens)
-    # print(f"current pointer: {pointer}, current tokens_left: {tokens_left}")
 
     while True:
         tokens_left -= 1
@@ -13,7 +22,6 @@ def match_stack(stack, tokens):
             break
         if pointer < 0:
             return False
-        # print(f"current stack: {stack[pointer]}, current token: {tokens[tokens_left]}")
         if stack[pointer] != tokens[tokens_left]:
             return False
     return True
