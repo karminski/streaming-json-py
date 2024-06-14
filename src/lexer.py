@@ -255,7 +255,7 @@ class Lexer:
 		check if JSON stream stopped in a number first decimal place, like `.?`
 		"""
 		
-		# `.`, TOKEN_NUMBER in stack
+		# `.`, lexer_tokens.TOKEN_NUMBER in stack
 		return self.get_top_token_on_stack() == lexer_tokens.TOKEN_DOT
 
 	def stream_stopped_in_a_number_decimal_part_middle(self) -> bool:
@@ -332,6 +332,445 @@ class Lexer:
 		token_result = token_mapping.get(token_symbol, lexer_tokens.TOKEN_OTHERS)
 		self.skip_json_segment(1)
 		return token_result, token_symbol
+
+	def append_string(self, string):
+		"""
+		append JSON string to current JSON stream content
+		this method will traversal all token and generate mirror token for complete full JSON
+		"""
+
+		self.json_segment = string
+		while True:
+			token, token_symbol = self.match_token()
+
+			if token == lexer_tokens.TOKEN_EOF:
+				pass
+			elif token == lexer_tokens.TOKEN_IGNORED:
+				if self.stream_stopped_in_a_string():
+					self.json_content += token_symbol
+					continue
+				self.push_byte_into_padding_content(token_symbol)
+			elif token == lexer_tokens.TOKEN_OTHERS:
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.json_content += token_symbol
+			elif token == lexer_tokens.TOKEN_LEFT_BRACKET:
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.json_content += token_symbol
+				if self.stream_stopped_in_a_string():
+					continue
+				self.push_token_stack(token)
+				if self.stream_stopped_in_an_object_array_value_start():
+					self.pop_mirror_token_stack()
+					self.pop_mirror_token_stack()
+					self.pop_mirror_token_stack()
+					self.pop_mirror_token_stack()
+				self.push_mirror_token_stack(lexer_tokens.TOKEN_RIGHT_BRACKET)
+			elif token == lexer_tokens.TOKEN_RIGHT_BRACKET:
+				if self.stream_stopped_in_a_string():
+					self.json_content += token_symbol
+					continue
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.json_content += token_symbol
+				self.push_token_stack(token)
+				self.pop_mirror_token_stack()
+			elif token == lexer_tokens.TOKEN_LEFT_BRACE:
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.json_content += token_symbol
+				if self.stream_stopped_in_a_string():
+					continue
+				self.push_token_stack(token)
+				if self.stream_stopped_in_an_object_object_value_start():
+					self.pop_mirror_token_stack()
+					self.pop_mirror_token_stack()
+					self.pop_mirror_token_stack()
+					self.pop_mirror_token_stack()
+				self.push_mirror_token_stack(lexer_tokens.TOKEN_RIGHT_BRACE)
+			elif token == lexer_tokens.TOKEN_RIGHT_BRACE:
+				if self.stream_stopped_in_a_string():
+					self.json_content += token_symbol
+					continue
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.json_content += token_symbol
+				self.push_token_stack(token)
+				self.pop_mirror_token_stack()
+			elif token == lexer_tokens.TOKEN_QUOTE:
+				if self.stream_stopped_with_leading_escape_character():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+					self.json_content += token_symbol
+					self.pop_token_stack()
+					continue
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.json_content += token_symbol
+				self.push_token_stack(token)
+				if self.stream_stopped_in_an_array():
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_QUOTE)
+				elif self.stream_stopped_in_an_array_string_value_end():
+					self.pop_mirror_token_stack()
+				elif self.stream_stopped_in_an_object_key_start():
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_N)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_COLON)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_QUOTE)
+				elif self.stream_stopped_in_an_object_key_end():
+					self.pop_mirror_token_stack()
+				elif self.stream_stopped_in_an_object_string_value_start():
+					self.pop_mirror_token_stack()
+					self.pop_mirror_token_stack()
+					self.pop_mirror_token_stack()
+					self.pop_mirror_token_stack()
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_QUOTE)
+				elif self.stream_stopped_in_an_object_value_end():
+					self.pop_mirror_token_stack()
+				else:
+					return "Invalid quote token in JSON stream"
+			elif  token == lexer_tokens.TOKEN_COLON:
+				if self.stream_stopped_in_a_string():
+					self.json_content += token_symbol
+					continue
+
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+
+				self.json_content += token_symbol
+				self.push_token_stack(token)
+
+				# pop `:` from mirror stack
+				self.pop_mirror_token_stack()
+
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_A:
+				if self.stream_stopped_in_an_string_unicode_escape():
+					self.push_byte_into_padding_content(token_symbol)
+					if len(self.padding_content) == 6:
+						self.append_padding_content_to_json_content()
+						self.clean_padding_content()
+						self.pop_token_stack()
+						self.pop_token_stack()
+					continue
+
+				self.json_content += token_symbol
+
+				if self.stream_stopped_in_a_string():
+					continue
+
+				if not self.it_is_part_of_token_false():
+					continue
+
+				self.push_token_stack(token)
+				self.push_mirror_token_stack()
+
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_B:
+				if self.stream_stopped_in_an_string_unicode_escape():
+					self.push_byte_into_padding_content(token_symbol)
+					if len(self.padding_content) == 6:
+						self.append_padding_content_to_json_content()
+						self.clean_padding_content()
+						self.pop_token_stack()
+						self.pop_token_stack()
+					continue
+
+				if self.stream_stopped_with_leading_escape_character():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+					self.json_content += token_symbol
+					self.pop_token_stack()
+					continue
+
+				self.json_content += token_symbol
+
+				if self.stream_stopped_in_a_string():
+					continue
+
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E:
+				if self.stream_stopped_in_an_string_unicode_escape():
+					self.push_byte_into_padding_content(token_symbol)
+					if len(self.padding_content) == 6:
+						self.append_padding_content_to_json_content()
+						self.clean_padding_content()
+						self.pop_token_stack()
+						self.pop_token_stack()
+					continue
+
+				if self.stream_stopped_in_a_number_decimal_part_middle():
+					self.push_byte_into_padding_content(token_symbol)
+					continue
+
+				self.json_content += token_symbol
+
+				if self.stream_stopped_in_a_string():
+					continue
+
+				if not self.it_is_part_of_token_false() and not self.it_is_part_of_token_true():
+					continue
+
+				self.push_token_stack(token)
+				self.push_mirror_token_stack()
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_F:
+				if self.stream_stopped_in_an_string_unicode_escape():
+					self.push_byte_into_padding_content(token_symbol)
+					if self.padding_content.Len() == 6:
+						self.append_padding_content_to_json_content()
+						self.clean_padding_content()
+						self.pop_token_stack()
+						self.pop_token_stack()
+					continue
+				if self.stream_stopped_with_leading_escape_character():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+					self.json_content.write(token_symbol)
+					self.pop_token_stack()
+					continue
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+				self.push_token_stack(token)
+				if self.stream_stopped_in_an_array():
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_S)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_A)
+				else:
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_S)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_A)
+	
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L:
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+				if not it_is_part_of_token_false() and not it_is_part_of_token_null1() and not it_is_part_of_token_null2():
+					continue
+				self.push_token_stack(token)
+				self.push_mirror_token_stack()
+	
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_N:
+				if self.stream_stopped_with_leading_escape_character():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+					self.json_content.write(token_symbol)
+					self.pop_token_stack()
+					continue
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+				self.push_token_stack(token)
+				if self.stream_stopped_in_an_array():
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U)
+				else:
+					self.push_mirror_token_stack()
+	
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_R:
+				if self.stream_stopped_with_leading_escape_character():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+					self.json_content.write(token_symbol)
+					self.pop_token_stack()
+					continue
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+				if not it_is_part_of_token_true():
+					continue
+				self.push_token_stack(token)
+				self.push_mirror_token_stack()
+
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_S:
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+				def it_is_part_of_token_false():
+					left = [lexer_tokens.TOKEN_ALPHABET_LOWERCASE_F, lexer_tokens.TOKEN_ALPHABET_LOWERCASE_A, lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L]
+					right = [lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E, lexer_tokens.TOKEN_ALPHABET_LOWERCASE_S]
+					return lexer_helper.match_stack(self.TokenStack, left) and lexer_helper.match_stack(self.MirrorTokenStack, right)
+				if not it_is_part_of_token_false():
+					continue
+				self.push_token_stack(token)
+				self.push_mirror_token_stack()
+
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_T:
+				if self.stream_stopped_with_leading_escape_character():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+					self.json_content.write(token_symbol)
+					self.pop_token_stack()
+					continue
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+				self.push_token_stack(token)
+				if self.stream_stopped_in_an_array():
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_R)
+				else:
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U)
+					self.push_mirror_token_stack(lexer_tokens.TOKEN_ALPHABET_LOWERCASE_R)
+
+			elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U:
+				if self.stream_stopped_with_leading_escape_character():
+					self.push_token_stack(token)
+					self.padding_content.write(token_symbol)
+					continue
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+				def it_is_part_of_token_true():
+					left = [lexer_tokens.TOKEN_ALPHABET_LOWERCASE_T, lexer_tokens.TOKEN_ALPHABET_LOWERCASE_R]
+					right = [lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E, lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U]
+					return lexer_helper.match_stack(self.TokenStack, left) and lexer_helper.match_stack(self.MirrorTokenStack, right)
+				def it_is_part_of_token_null():
+					left = [lexer_tokens.TOKEN_ALPHABET_LOWERCASE_N]
+					right = [lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L, lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L, lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U]
+					return lexer_helper.match_stack(self.TokenStack, left) and lexer_helper.match_stack(self.MirrorTokenStack, right)
+				if not it_is_part_of_token_true() and not it_is_part_of_token_null():
+					continue
+				self.push_token_stack(token)
+				self.push_mirror_token_stack()
+
+			elif token in [lexer_tokens.TOKEN_ALPHABET_UPPERCASE_A, lexer_tokens.TOKEN_ALPHABET_UPPERCASE_B, lexer_tokens.TOKEN_ALPHABET_UPPERCASE_C, lexer_tokens.TOKEN_ALPHABET_UPPERCASE_D, lexer_tokens.TOKEN_ALPHABET_LOWERCASE_C, lexer_tokens.TOKEN_ALPHABET_LOWERCASE_D, lexer_tokens.TOKEN_ALPHABET_UPPERCASE_F]:
+				if self.stream_stopped_in_an_string_unicode_escape():
+					self.push_byte_into_padding_content(token_symbol)
+					if self.padding_content.Len() == 6:
+						self.append_padding_content_to_json_content()
+						self.clean_padding_content()
+						self.pop_token_stack()
+						self.pop_token_stack()
+					continue
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+			
+			elif token == lexer_tokens.TOKEN_ALPHABET_UPPERCASE_E:
+				if self.stream_stopped_in_an_string_unicode_escape():
+					self.push_byte_into_padding_content(token_symbol)
+					if len(self.padding_content) == 6:
+						self.append_padding_content_to_json_content()
+						self.clean_padding_content()
+						self.pop_token_stack()
+						self.pop_token_stack()
+					continue
+				if self.stream_stopped_in_a_number_decimal_part_middle():
+					self.push_byte_into_padding_content(token_symbol)
+					continue
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+			elif token in [lexer_tokens.TOKEN_NUMBER_0, lexer_tokens.TOKEN_NUMBER_1, lexer_tokens.TOKEN_NUMBER_2, lexer_tokens.TOKEN_NUMBER_3, lexer_tokens.TOKEN_NUMBER_4, lexer_tokens.TOKEN_NUMBER_5, lexer_tokens.TOKEN_NUMBER_6, lexer_tokens.TOKEN_NUMBER_7, lexer_tokens.TOKEN_NUMBER_8, lexer_tokens.TOKEN_NUMBER_9]:
+				if self.stream_stopped_in_an_string_unicode_escape():
+					self.push_byte_into_padding_content(token_symbol)
+					if len(self.padding_content) == 6:
+						self.append_padding_content_to_json_content()
+						self.clean_padding_content()
+						self.pop_token_stack()
+						self.pop_token_stack()
+					continue
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				if self.stream_stopped_in_a_negative_number_value_start():
+					self.push_negative_into_json_content()
+					self.push_mirror_token_stack()
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string() or self.stream_stopped_in_a_number():
+					continue
+				if self.stream_stopped_in_a_number_decimal_part():
+					self.push_token_stack(lexer_tokens.TOKEN_NUMBER)
+					self.push_mirror_token_stack()
+					continue
+				self.push_token_stack(lexer_tokens.TOKEN_NUMBER)
+				if self.stream_stopped_in_an_array():
+					continue
+				elif self.stream_stopped_in_an_object_null_value_placeholder_start():
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+			elif token == lexer_tokens.TOKEN_COMMA:
+				if self.stream_stopped_in_a_string():
+					self.json_content.write(token_symbol)
+					continue
+				self.push_byte_into_padding_content(token_symbol)
+				self.push_token_stack(token)
+			elif token == lexer_tokens.TOKEN_DOT:
+				self.json_content.write(token_symbol)
+				if self.stream_stopped_in_a_string():
+					continue
+				self.push_token_stack(token)
+				self.push_mirror_token_stack(lexer_tokens.TOKEN_NUMBER_0)
+			elif token == lexer_tokens.TOKEN_SLASH:
+				if self.stream_stopped_with_leading_escape_character():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+					self.json_content.write(token_symbol)
+					self.pop_token_stack()
+					continue
+			elif token == lexer_tokens.TOKEN_ESCAPE_CHARACTER:
+				if self.stream_stopped_with_leading_escape_character():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+					self.json_content.write(token_symbol)
+					self.pop_token_stack()
+					continue
+				self.push_token_stack(token)
+				self.push_byte_into_padding_content(lexer_tokens.TOKEN_ESCAPE_CHARACTER_SYMBOL)
+			elif token == lexer_tokens.TOKEN_NEGATIVE:
+				if self.stream_stopped_in_a_string():
+					self.json_content.write(token_symbol)
+					continue
+				if self.have_padding_content():
+					self.append_padding_content_to_json_content()
+					self.clean_padding_content()
+				self.push_token_stack(token)
+				if self.stream_stopped_in_an_object_negative_number_value_start():
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+					self.push_mirror_token_stack()
+				self.push_mirror_token_stack(lexer_tokens.TOKEN_NUMBER_0)
+
+			else:
+				return f"Unexpected token: {token}, token symbol: {token_symbol}"
+
+			if token == lexer_tokens.TOKEN_EOF:
+				break
+
+		return None
 
 	def complete_json(self):
 		"""
