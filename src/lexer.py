@@ -85,13 +85,13 @@ class Lexer:
         """
         push negative symbol `-` into JSON content
         """
-        self.json_content.append(chr(lexer_tokens.TOKEN_NEGATIVE_SYMBOL))
+        self.json_content.append(lexer_tokens.TOKEN_NEGATIVE_SYMBOL)
 
     def push_byte_into_padding_content(self, b):
         """
         push byte into JSON content by given
         """
-        self.padding_content.append(chr(b))
+        self.padding_content.append(b)
 
     def append_padding_content_to_json_content(self):
         """
@@ -1033,7 +1033,7 @@ class Lexer:
                 if self.stream_stopped_in_an_string_unicode_escape():
                     self.push_byte_into_padding_content(token_symbol)
                     # check if unicode escape is full length
-                    if self.padding_content.Len() == 6:
+                    if len(self.padding_content) == 6:
                         self.append_padding_content_to_json_content()
                         self.clean_padding_content()
                         # pop `\`, `u` from stack
