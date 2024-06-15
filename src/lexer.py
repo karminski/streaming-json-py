@@ -569,12 +569,12 @@ class Lexer:
 
                 # check if `f` in token stack and `a`, `l`, `s`, `e in mirror stack
                 def it_is_part_of_token_false():
-                    left = [token_symbol.TOKEN_ALPHABET_LOWERCASE_F]
+                    left = [lexer_tokens.TOKEN_ALPHABET_LOWERCASE_F]
                     right = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_E,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_S,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_L,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_A,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_S,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_A,
                     ]
                     return lexer_helper.match_stack(
                         self.token_stack, left
@@ -644,13 +644,13 @@ class Lexer:
                 # check if `f`, `a`, `l`, `s` in token stack and `e` in mirror stack
                 def it_is_part_of_token_false():
                     left = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_F,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_A,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_L,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_S,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_F,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_A,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_S,
                     ]
                     right = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_E,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E,
                     ]
                     return lexer_helper.match_stack(
                         self.token_stack, left
@@ -659,12 +659,12 @@ class Lexer:
                 # check if `t`, `r`, `u` in token stack and `e` in mirror stack
                 def it_is_part_of_token_true():
                     left = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_T,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_R,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_U,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_T,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_R,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U,
                     ]
                     right = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_E,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E,
                     ]
                     return lexer_helper.match_stack(
                         self.token_stack, left
@@ -694,7 +694,7 @@ class Lexer:
                     self.append_padding_content_to_json_content()
                     self.clean_padding_content()
                     # write current token symbol to JSON content
-                    self.json_content.write(token_symbol)
+                    self.json_content.append(token_symbol)
                     # pop `\` from  stack
                     self.pop_token_stack()
                     continue
@@ -705,7 +705,7 @@ class Lexer:
                     self.clean_padding_content()
 
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
@@ -751,7 +751,7 @@ class Lexer:
 
             elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L:
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
                     continue
@@ -759,13 +759,13 @@ class Lexer:
                 # check if `f`, `a` in token stack and, `l`, `s`, `e` in mirror stack
                 def it_is_part_of_token_false():
                     left = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_F,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_A,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_F,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_A,
                     ]
                     right = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_E,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_S,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_L,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_S,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L,
                     ]
                     return lexer_helper.match_stack(
                         self.token_stack, left
@@ -774,12 +774,12 @@ class Lexer:
                 # check if `n`, `u` in token stack and `l`, `l` in mirror stack
                 def it_is_part_of_token_null1():
                     left = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_N,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_U,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_N,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U,
                     ]
                     right = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_L,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_L,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L,
                     ]
                     return lexer_helper.match_stack(
                         self.token_stack, left
@@ -788,12 +788,12 @@ class Lexer:
                 # check if `n`, `u`, `l` in token stack and `l` in mirror stack
                 def it_is_part_of_token_null2():
                     left = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_N,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_U,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_L,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_N,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L,
                     ]
                     right = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_L,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_L,
                     ]
                     return lexer_helper.match_stack(
                         self.token_stack, left
@@ -816,7 +816,7 @@ class Lexer:
                     self.append_padding_content_to_json_content()
                     self.clean_padding_content()
                     # write current token symbol to JSON content
-                    self.json_content.write(token_symbol)
+                    self.json_content.append(token_symbol)
                     # pop `\` from  stack
                     self.pop_token_stack()
                     continue
@@ -827,7 +827,7 @@ class Lexer:
                     self.clean_padding_content()
 
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
@@ -857,13 +857,13 @@ class Lexer:
                     self.append_padding_content_to_json_content()
                     self.clean_padding_content()
                     # write current token symbol to JSON content
-                    self.json_content.write(token_symbol)
+                    self.json_content.append(token_symbol)
                     # pop `\` from  stack
                     self.pop_token_stack()
                     continue
 
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
@@ -872,12 +872,12 @@ class Lexer:
                 # check if `t` in token stack and `r`, `u`, `e in mirror stack
                 def it_is_part_of_token_true():
                     left = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_T,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_T,
                     ]
                     right = [
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_E,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_U,
-                        token_symbol.TOKEN_ALPHABET_LOWERCASE_R,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_E,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U,
+                        lexer_tokens.TOKEN_ALPHABET_LOWERCASE_R,
                     ]
                     return lexer_helper.match_stack(
                         self.token_stack, left
@@ -891,7 +891,7 @@ class Lexer:
 
             elif token == lexer_tokens.TOKEN_ALPHABET_LOWERCASE_S:
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
@@ -925,7 +925,7 @@ class Lexer:
                     self.append_padding_content_to_json_content()
                     self.clean_padding_content()
                     # write current token symbol to JSON content
-                    self.json_content.write(token_symbol)
+                    self.json_content.append(token_symbol)
                     # pop `\` from  stack
                     self.pop_token_stack()
                     continue
@@ -936,7 +936,7 @@ class Lexer:
                     self.clean_padding_content()
 
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
@@ -978,11 +978,11 @@ class Lexer:
                 # unicode escape `\`, `u`
                 if self.stream_stopped_with_leading_escape_character():
                     self.push_token_stack(token)
-                    self.padding_content.write(token_symbol)
+                    self.padding_content.append(token_symbol)
                     continue
 
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
@@ -1042,7 +1042,7 @@ class Lexer:
                     continue
 
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
@@ -1067,7 +1067,7 @@ class Lexer:
                     continue
 
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
@@ -1108,7 +1108,7 @@ class Lexer:
                     self.pop_mirror_token_stack()
 
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string or a number, just skip token
                 if (
@@ -1140,7 +1140,7 @@ class Lexer:
             elif token == lexer_tokens.TOKEN_COMMA:
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
-                    self.json_content.write(token_symbol)
+                    self.json_content.append(token_symbol)
                     continue
                 # in a object or a array, keep the comma in stack but not write it into JSONContent, until next token arrival
                 # the comma must following with token: quote, null, true, false, number
@@ -1148,7 +1148,7 @@ class Lexer:
                 self.push_token_stack(token)
             elif token == lexer_tokens.TOKEN_DOT:
                 # write current token symbol to JSON content
-                self.json_content.write(token_symbol)
+                self.json_content.append(token_symbol)
 
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
@@ -1165,7 +1165,7 @@ class Lexer:
                     self.append_padding_content_to_json_content()
                     self.clean_padding_content()
                     # write current token symbol to JSON content
-                    self.json_content.write(token_symbol)
+                    self.json_content.append(token_symbol)
                     # pop `\` from  stack
                     self.pop_token_stack()
                     continue
@@ -1177,7 +1177,7 @@ class Lexer:
                     self.append_padding_content_to_json_content()
                     self.clean_padding_content()
                     # write current token symbol to JSON content
-                    self.json_content.write(token_symbol)
+                    self.json_content.append(token_symbol)
                     # pop `\` from  stack
                     self.pop_token_stack()
                     continue
@@ -1190,7 +1190,7 @@ class Lexer:
             elif token == lexer_tokens.TOKEN_NEGATIVE:
                 # in a string, just skip token
                 if self.stream_stopped_in_a_string():
-                    self.json_content.write(token_symbol)
+                    self.json_content.append(token_symbol)
                     continue
 
                 # check if json stream stopped with padding content, like `[1 , -`
