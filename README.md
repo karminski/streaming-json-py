@@ -1,5 +1,8 @@
 # streaming-json-py
 
+[![codecov](https://codecov.io/gh/karminski/streaming-json-py/graph/badge.svg?token=1901RX87FK)](https://codecov.io/gh/karminski/streaming-json-py)
+
+
 
 Welcome to **streaming-json-py**, a groundbreaking library designed to revolutionize the way we handle stream JSON parsing.  
 
