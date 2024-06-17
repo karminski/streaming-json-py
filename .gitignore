@@ -3,6 +3,8 @@
 .cache
 .venv
 .eggs
+.tox
+.coverage
 Pipfile*
 build
 dist

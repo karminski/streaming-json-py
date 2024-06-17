@@ -1,15 +1,15 @@
-import unittest
-from streamingjson import lexer_helper 
+import pytest
+from streamingjson import lexer_helper
 from streamingjson import lexer_tokens
 
 
-class TestMatchStack(unittest.TestCase):
+class TestMatchStack:
 
     def test_match_stack_0(self):
         stack = [lexer_tokens.TOKEN_LEFT_BRACE]
         tokens = [lexer_tokens.TOKEN_LEFT_BRACE]
         match_result = lexer_helper.match_stack(stack, tokens)
-        self.assertTrue(match_result, "the tokens should be match")
+        assert match_result == True
 
     def test_match_stack_1(self):
         stack = [
@@ -29,7 +29,7 @@ class TestMatchStack(unittest.TestCase):
             lexer_tokens.TOKEN_COLON,
         ]
         match_result = lexer_helper.match_stack(stack, tokens)
-        self.assertTrue(match_result, "the tokens should be match")
+        assert match_result == True
 
     def test_match_stack_2(self):
         stack = [
@@ -45,8 +45,4 @@ class TestMatchStack(unittest.TestCase):
             lexer_tokens.TOKEN_ALPHABET_LOWERCASE_U,
         ]
         match_result = lexer_helper.match_stack(stack, tokens)
-        self.assertTrue(match_result, "the tokens should be match")
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert match_result == True

@@ -1,9 +1,9 @@
-import unittest
+import pytest
 from streamingjson import lexer
 import json
 
 
-class TestCompleteJSONBase(unittest.TestCase):
+class TestCompleteJSONBase():
 
     def test_complete_json_base(self):
         streaming_json_case = {
@@ -461,8 +461,8 @@ class TestCompleteJSONBase(unittest.TestCase):
             lexer_instance = lexer.Lexer()
             err_in_append_string = lexer_instance.append_string(test_case)
             ret = lexer_instance.complete_json()
-            self.assertIsNone(err_in_append_string)
-            self.assertEqual(expect, ret, "unexpected JSON")
+            assert err_in_append_string is None
+            assert expect == ret, "unexpected JSON"
 
 
     def test_complete_json_nestad(self):
@@ -470,7 +470,7 @@ class TestCompleteJSONBase(unittest.TestCase):
         lexer_instance = lexer.Lexer()
         for char in streaming_json_content:
             err_in_append_string = lexer_instance.append_string(char)
-            self.assertIsNone(err_in_append_string)
+            assert err_in_append_string is None
             ret = lexer_instance.complete_json()
             interface_for_json = None
             err_in_unmarshal = None
@@ -478,8 +478,7 @@ class TestCompleteJSONBase(unittest.TestCase):
                 interface_for_json = json.loads(ret)
             except Exception as e:
                 err_in_unmarshal = e
-            self.assertIsNone(err_in_unmarshal)
-
+            assert err_in_unmarshal is None
 
     def test_complete_json_nestad2(self):
         streaming_json_content = '''{
@@ -535,7 +534,7 @@ class TestCompleteJSONBase(unittest.TestCase):
         lexer_instance = lexer.Lexer()
         for char in streaming_json_content:
             err_in_append_string = lexer_instance.append_string(char)
-            self.assertIsNone(err_in_append_string)
+            assert err_in_append_string is None
             ret = lexer_instance.complete_json()
             interface_for_json = None
             err_in_unmarshal = None
@@ -543,7 +542,7 @@ class TestCompleteJSONBase(unittest.TestCase):
                 interface_for_json = json.loads(ret)
             except Exception as e:
                 err_in_unmarshal = e
-            self.assertIsNone(err_in_unmarshal)
+            assert err_in_unmarshal is None
 
 
     def test_complete_json_escape_and_etc(self):
@@ -574,7 +573,7 @@ class TestCompleteJSONBase(unittest.TestCase):
         lexer_instance = lexer.Lexer()
         for char in streaming_json_content:
             err_in_append_string = lexer_instance.append_string(char)
-            self.assertIsNone(err_in_append_string)
+            assert err_in_append_string is None
             ret = lexer_instance.complete_json()
             interface_for_json = None
             err_in_unmarshal = None
@@ -582,8 +581,4 @@ class TestCompleteJSONBase(unittest.TestCase):
                 interface_for_json = json.loads(ret)
             except Exception as e:
                 err_in_unmarshal = e
-            self.assertIsNone(err_in_unmarshal)
-
-
-if __name__ == "__main__":
-    unittest.main()
+            assert err_in_unmarshal is None
