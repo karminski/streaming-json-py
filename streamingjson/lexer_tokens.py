@@ -1,3 +1,6 @@
+"""
+Tokens for lexer
+"""
 # Token constants
 TOKEN_EOF = 0  # end-of-file
 TOKEN_IGNORED = 1  # \t', '\n', '\v', '\f', '\r', ' '

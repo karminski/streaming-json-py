@@ -1,5 +1,5 @@
 import unittest
-import lexer
+from streamingjson import lexer
 import json
 
 
@@ -465,124 +465,124 @@ class TestCompleteJSONBase(unittest.TestCase):
             self.assertEqual(expect, ret, "unexpected JSON")
 
 
-def test_complete_json_nestad(self):
-    streaming_json_content = '{"string": "这是一个字符串", "integer": 42, "float": 3.14159, "boolean_true": true, "boolean_false": false, "null": null, "object": {"empty_object": {}, "non_empty_object": {"key": "value"}, "nested_object": {"nested_key": {"sub_nested_key": "sub_nested_value"}}}, "array":["string in array", 123, 45.67, true, false, null, {"object_in_array": "object_value"},["nested_array"]]}'
-    lexer_instance = lexer.Lexer()
-    for char in streaming_json_content:
-        err_in_append_string = lexer_instance.append_string(char)
-        self.assertIsNone(err_in_append_string)
-        ret = lexer_instance.complete_json()
-        interface_for_json = None
-        err_in_unmarshal = None
-        try:
-            interface_for_json = json.loads(ret)
-        except Exception as e:
-            err_in_unmarshal = e
-        self.assertIsNone(err_in_unmarshal)
+    def test_complete_json_nestad(self):
+        streaming_json_content = '{"string": "这是一个字符串", "integer": 42, "float": 3.14159, "boolean_true": true, "boolean_false": false, "null": null, "object": {"empty_object": {}, "non_empty_object": {"key": "value"}, "nested_object": {"nested_key": {"sub_nested_key": "sub_nested_value"}}}, "array":["string in array", 123, 45.67, true, false, null, {"object_in_array": "object_value"},["nested_array"]]}'
+        lexer_instance = lexer.Lexer()
+        for char in streaming_json_content:
+            err_in_append_string = lexer_instance.append_string(char)
+            self.assertIsNone(err_in_append_string)
+            ret = lexer_instance.complete_json()
+            interface_for_json = None
+            err_in_unmarshal = None
+            try:
+                interface_for_json = json.loads(ret)
+            except Exception as e:
+                err_in_unmarshal = e
+            self.assertIsNone(err_in_unmarshal)
 
 
-def test_complete_json_nestad2(self):
-    streaming_json_content = """{
-    "string_with_escape_chars": "This string contains escape characters like \\"quotes\", \\\\backslashes\\\\, \\/forwardslashes/, \\bbackspace\\b, \\fformfeed\\f, \\nnewline\\n, \\rcarriage return\\r, \\ttab\\t.",
-    "scientific_notation": 2.998e8,
-    "unicode_characters": "Some unicode characters: \\u0041\\u0042\\u0043\\u0044",
-    "multiple_lang_strings": {
-        "english": "Hello, World!",
-        "chinese": "你好，世界！",
-        "spanish": "¡Hola, mundo!",
-        "russian": "Привет, мир!"
-    },
-    "json_tokens_as_strings": "{\\"key_with_invalid_token\\": \\"value_with_invalid_separator\\": \\"a\\"}",
-    "nested_objects": {
-        "nested_object1": {
-            "key1": "value1",
-            "key2": "value2",
-            "nested_object2": {
-                "inner_key1": "inner_value1",
-                "inner_key2": "inner_value2"
-            }
-        },
-        "nested_object2": {
-            "name": "John Doe",
-            "age": 30,
-            "address": {
-                "street": "123 Main St",
-                "city": "Anytown"
+    def test_complete_json_nestad2(self):
+        streaming_json_content = '''{
+            "string_with_escape_chars": "This string contains escape characters like \\\"quotes\\\", \\\\backslashes\\\\, \\/forwardslashes/, \\bbackspace\\b, \\fformfeed\\f, \\nnewline\\n, \\rcarriage return\\r, \\ttab\\t.",
+            "scientific_notation": 2.998e8,
+            "unicode_characters": "Some unicode characters: \\u0041\\u0042\\u0043\\u0044",
+            "multiple_lang_strings": {
+                "english": "Hello, World!",
+                "chinese": "你好，世界！",
+                "spanish": "¡Hola, mundo!",
+                "russian": "Привет, мир!"
+            },
+            "json_tokens_as_strings": "{\\"key_with_invalid_token\\": \\"value_with_invalid_separator\\": \\"a\\"}",
+            "nested_objects": {
+                "nested_object1": {
+                    "key1": "value1",
+                    "key2": "value2",
+                    "nested_object2": {
+                        "inner_key1": "inner_value1",
+                        "inner_key2": "inner_value2"
+                    }
+                },
+                "nested_object2": {
+                    "name": "John Doe",
+                    "age": 30,
+                    "address": {
+                        "street": "123 Main St",
+                        "city": "Anytown"
+                    }
+                }
+            },
+            "array_test": {
+                "simple_array": [10, 20, 30, 40, 50],
+                "array_of_objects": [
+                    {
+                        "name": "Alice",
+                        "age": 25
+                    },
+                    {
+                        "name": "Bob",
+                        "age": 30
+                    }
+                ],
+                "nested_arrays": [
+                    [1, 2, 3],
+                    [true, false, null]
+                ],
+                "empty_objects": {},
+                "empty_arrays": []
             }
         }
-    },
-    "array_test": {
-        "simple_array": [10, 20, 30, 40, 50],
-        "array_of_objects": [
-            {
-                "name": "Alice",
-                "age": 25
-            },
-            {
-                "name": "Bob",
-                "age": 30
-            }
-        ],
-        "nested_arrays": [
-            [1, 2, 3],
-            [true, false, null]
-        ],
-        "empty_objects": {},
-        "empty_arrays": []
-    }
-}
-    """
-    lexer_instance = lexer.Lexer()
-    for char in streaming_json_content:
-        err_in_append_string = lexer_instance.append_string(char)
-        self.assertIsNone(err_in_append_string)
-        ret = lexer_instance.complete_json()
-        interface_for_json = None
-        err_in_unmarshal = None
-        try:
-            interface_for_json = json.loads(ret)
-        except Exception as e:
-            err_in_unmarshal = e
-        self.assertIsNone(err_in_unmarshal)
+        '''
+        lexer_instance = lexer.Lexer()
+        for char in streaming_json_content:
+            err_in_append_string = lexer_instance.append_string(char)
+            self.assertIsNone(err_in_append_string)
+            ret = lexer_instance.complete_json()
+            interface_for_json = None
+            err_in_unmarshal = None
+            try:
+                interface_for_json = json.loads(ret)
+            except Exception as e:
+                err_in_unmarshal = e
+            self.assertIsNone(err_in_unmarshal)
 
 
-def test_complete_json_escape_and_etc(self):
-    streaming_json_content = """{
-  "string": "含有转义字符的字符串：\\"\\\\\\/\\b\\f\\n\\r\\t",
-  "string_unicode": "含Unicode字符：\\u6211\\u662F",
-  "negative_integer": -42,
-  "float_scientific_notation": 6.02e23,
-  "negative_float": -3.14159,
-  "array_with_various_numbers": [
-    0,
-    -1,
-    2.99792458e8,
-    -6.62607015e-34
-  ],
-  "special_characters": "\\u003C\\u003E\\u0026\\u0027\\u0022",
-  "nested_structure": {
-    "nested_key_with_escaped_chars": "这是一个带有转义字符的字符串：\\\\n\\\\r\\\\t",
-    "nested_object": {
-      "bool_true": true,
-      "bool_false": false,
-      "null_value": null,
-      "complex_number": 3.14e-10
+    def test_complete_json_escape_and_etc(self):
+        streaming_json_content = '''{
+      "string": "含有转义字符的字符串：\\"\\\\\\/\\b\\f\\n\\r\\t",
+      "string_unicode": "含Unicode字符：\\u6211\\u662F",
+      "negative_integer": -42,
+      "float_scientific_notation": 6.02e23,
+      "negative_float": -3.14159,
+      "array_with_various_numbers": [
+        0,
+        -1,
+        2.99792458e8,
+        -6.62607015e-34
+      ],
+      "special_characters": "\\u003C\\u003E\\u0026\\u0027\\u0022",
+      "nested_structure": {
+        "nested_key_with_escaped_chars": "这是一个带有转义字符的字符串：\\\\n\\\\r\\\\t",
+        "nested_object": {
+          "bool_true": true,
+          "bool_false": false,
+          "null_value": null,
+          "complex_number": 3.14e-10
+        }
+      }
     }
-  }
-}
-    """
-    lexer_instance = lexer.Lexer()
-    for char in streaming_json_content:
-        err_in_append_string = lexer_instance.append_string(char)
-        self.assertIsNone(err_in_append_string)
-        ret = lexer_instance.complete_json()
-        interface_for_json = None
-        err_in_unmarshal = None
-        try:
-            interface_for_json = json.loads(ret)
-        except Exception as e:
-            err_in_unmarshal = e
-        self.assertIsNone(err_in_unmarshal)
+        '''
+        lexer_instance = lexer.Lexer()
+        for char in streaming_json_content:
+            err_in_append_string = lexer_instance.append_string(char)
+            self.assertIsNone(err_in_append_string)
+            ret = lexer_instance.complete_json()
+            interface_for_json = None
+            err_in_unmarshal = None
+            try:
+                interface_for_json = json.loads(ret)
+            except Exception as e:
+                err_in_unmarshal = e
+            self.assertIsNone(err_in_unmarshal)
 
 
 if __name__ == "__main__":

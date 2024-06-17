@@ -3,8 +3,8 @@ streaming-json-py main lexer method
 This method will 
 """
 
-import lexer_tokens
-import lexer_helper
+from streamingjson import lexer_tokens
+from streamingjson import lexer_helper
 
 
 class Lexer:

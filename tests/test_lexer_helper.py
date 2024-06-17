@@ -1,6 +1,6 @@
 import unittest
-import lexer_helper
-import lexer_tokens
+from streamingjson import lexer_helper 
+from streamingjson import lexer_tokens
 
 
 class TestMatchStack(unittest.TestCase):
