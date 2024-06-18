@@ -2,11 +2,13 @@
 helper method for lexer
 """
 
+
 def is_ignore_token(c):
     """
     check if target character is ignore token
     """
-    return c in '\t\n\v\f\r '
+    return c in "\t\n\v\f\r "
+
 
 def match_stack(stack, tokens):
     """
