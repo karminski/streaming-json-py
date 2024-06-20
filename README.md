@@ -2,7 +2,9 @@
 
 [![codecov](https://codecov.io/gh/karminski/streaming-json-py/graph/badge.svg?token=1901RX87FK)](https://codecov.io/gh/karminski/streaming-json-py)
 
-
+```python
+import streamingjson
+```
 
 Welcome to **streaming-json-py**, a groundbreaking library designed to revolutionize the way we handle stream JSON parsing.  
 
@@ -37,10 +39,25 @@ Escaped characters? No problem:
 
 **Here’s a quick example to get you started:**
 
+```python
+# init, @NOTE: We need to assign a new lexer for each JSON stream.
+lexer = streamingjson.Lexer()
+
+# append your JSON segment
+lexer.append_string('{"a":')
+
+# complete the JSON
+print(lexer.complete_json()) # will print `{"a":null}`
+
+# append more JSON segment
+lexer.append_string('[tr')
+
+# complete the JSON again
+print(lexer.complete_json()) # will print `{"a":[true]}`
+```
+
 
 For more examples please see: [examples](./examples/)
-
-### Benchmarks
 
 
 ### License
