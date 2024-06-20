@@ -1,11 +1,20 @@
-import pytest
-from streamingjson import lexer
+"""
+test cases for lexer
+"""
+
 import json
+from streamingjson import lexer
 
 
-class TestCompleteJSONBase():
+class TestCompleteJSONBase:
+    """
+    lexer test cases
+    """
 
     def test_complete_json_base(self):
+        """
+        base test cases, will test all case in incomplete json
+        """
         streaming_json_case = {
             # test case: basic object properity
             "{": "{}",  # mirror stack: [], should remove from stack: [], should push into mirror stack: ['}']
@@ -464,8 +473,10 @@ class TestCompleteJSONBase():
             assert err_in_append_string is None
             assert expect == ret, "unexpected JSON"
 
-
     def test_complete_json_nestad(self):
+        """
+        test nestad JSON by each caracter
+        """
         streaming_json_content = '{"string": "这是一个字符串", "integer": 42, "float": 3.14159, "boolean_true": true, "boolean_false": false, "null": null, "object": {"empty_object": {}, "non_empty_object": {"key": "value"}, "nested_object": {"nested_key": {"sub_nested_key": "sub_nested_value"}}}, "array":["string in array", 123, 45.67, true, false, null, {"object_in_array": "object_value"},["nested_array"]]}'
         lexer_instance = lexer.Lexer()
         for char in streaming_json_content:
@@ -481,7 +492,10 @@ class TestCompleteJSONBase():
             assert err_in_unmarshal is None
 
     def test_complete_json_nestad2(self):
-        streaming_json_content = '''{
+        """
+        test nestad JSON by each caracter, new line included
+        """
+        streaming_json_content = """{
             "string_with_escape_chars": "This string contains escape characters like \\\"quotes\\\", \\\\backslashes\\\\, \\/forwardslashes/, \\bbackspace\\b, \\fformfeed\\f, \\nnewline\\n, \\rcarriage return\\r, \\ttab\\t.",
             "scientific_notation": 2.998e8,
             "unicode_characters": "Some unicode characters: \\u0041\\u0042\\u0043\\u0044",
@@ -530,7 +544,7 @@ class TestCompleteJSONBase():
                 "empty_arrays": []
             }
         }
-        '''
+        """
         lexer_instance = lexer.Lexer()
         for char in streaming_json_content:
             err_in_append_string = lexer_instance.append_string(char)
@@ -544,9 +558,11 @@ class TestCompleteJSONBase():
                 err_in_unmarshal = e
             assert err_in_unmarshal is None
 
-
     def test_complete_json_escape_and_etc(self):
-        streaming_json_content = '''{
+        """
+        test escape caracter and unicode
+        """
+        streaming_json_content = """{
       "string": "含有转义字符的字符串：\\"\\\\\\/\\b\\f\\n\\r\\t",
       "string_unicode": "含Unicode字符：\\u6211\\u662F",
       "negative_integer": -42,
@@ -569,7 +585,7 @@ class TestCompleteJSONBase():
         }
       }
     }
-        '''
+        """
         lexer_instance = lexer.Lexer()
         for char in streaming_json_content:
             err_in_append_string = lexer_instance.append_string(char)
