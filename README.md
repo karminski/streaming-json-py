@@ -39,6 +39,14 @@ Escaped characters? No problem:
 
 **Here’s a quick example to get you started:**
 
+install from pypi:
+
+```bash
+pip install streamingjson
+```
+
+run example:
+
 ```python
 # init, @NOTE: We need to assign a new lexer for each JSON stream.
 lexer = streamingjson.Lexer()
