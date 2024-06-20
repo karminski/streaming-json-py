@@ -1,6 +1,6 @@
 from .lexer import Lexer
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 __title__ = "streamingjson"
 __description__ = (
