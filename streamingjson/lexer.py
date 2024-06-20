@@ -393,7 +393,10 @@ class Lexer:
         self.__skip_json_segment(1)
         return token_result, token_symbol
 
-    def append_string(self, string):
+    def append_string(
+        self,
+        string: str,
+    ):
         """
         append JSON string to current JSON stream content
         this method will traversal all token and generate mirror token for complete full JSON
@@ -1221,7 +1224,7 @@ class Lexer:
 
         return None
 
-    def complete_json(self):
+    def complete_json(self) -> str:
         """
         complete the incomplete JSON string by concat JSON content and mirror tokens
         """
