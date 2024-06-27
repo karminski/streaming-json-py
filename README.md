@@ -67,6 +67,14 @@ print(lexer.complete_json()) # will print `{"a":[true]}`
 
 For more examples please see: [examples](./examples/)
 
+### Try to Find This Library in Another Programming Language?
+
+Please see:
+
+- [streaming-json-go](https://github.com/karminski/streaming-json-go)
+- [streaming-json-py](https://github.com/karminski/streaming-json-py)
+- [streaming-json-js](https://github.com/karminski/streaming-json-js)
+
 
 ### License
 
