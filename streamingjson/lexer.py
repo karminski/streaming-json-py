@@ -1175,6 +1175,9 @@ class Lexer:
                     # pop `\` from  stack
                     self.__pop_token_stack()
                     continue
+                elif self.__stream_stopped_in_a_string():
+                    self.json_content.append(token_symbol)
+                    continue
 
             elif token == lexer_tokens.TOKEN_ESCAPE_CHARACTER:
                 # double escape character `\`, `\`
