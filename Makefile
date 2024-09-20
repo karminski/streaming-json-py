@@ -1,6 +1,6 @@
-.PHONY: build all test clean
+.PHONY: build all manual-build manual-upload-to-testpypi manual-upload-to-pypi test
 
-all: build 
+all: manual-build 
 
 manual-build: python -m build
 
@@ -10,5 +10,5 @@ manual-upload-to-testpypi:
 manual-upload-to-pypi:
 	python -m twine upload --repository pypi dist/*
 
-run-tox:
+test:
 	python -m tox
