@@ -72,6 +72,7 @@ class TestCompleteJSONBase:
             '{"a":"abcdefghijklmnopqrstuvwxyz",': '{"a":"abcdefghijklmnopqrstuvwxyz"}',
             '{"a":"ABCDEFGHIJKLMNOPQRSTUVWXYZ",': '{"a":"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}',
             '{"a":"0123456789",': '{"a":"0123456789"}',
+            '{"a":"https://': '{"a":"https://"}',
             '{"a":"\\u0': '{"a":""}',
             '{"a":"\\u00': '{"a":""}',
             '{"a":"\\u004': '{"a":""}',
